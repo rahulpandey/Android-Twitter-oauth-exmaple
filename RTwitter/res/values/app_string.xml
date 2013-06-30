@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="login">Login</string>
+    <string name="please_connect">Please connect to working Internet connection</string>
+    <string name="logout">Logout</string>
+    <string name="status">Update Staus</string>
+    <string name="update">Update</string>
+    <string name="this_field_require">This Field require</string>
+    <string name="status_tweeted_successfully">Status tweeted successfully</string>
+
+</resources>
