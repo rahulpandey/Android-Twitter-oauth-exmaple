@@ -1,8 +1,5 @@
 package com.application.app.rtwitter;
 
-
-
-import com.application.app.fragment.HomeFragment;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -10,51 +7,44 @@ import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
-import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
-@SuppressLint("NewApi")
-public class MainActivity extends FragmentActivity implements HomeFragment.OnTwitterUpdateListener{
-	
-	private static final int LOGIN = 0;
-	private static final int HOME = 1;
-	private static final int FRAGMENT_COUNT = HOME + 1;
-	private static final int REQUEST_CODE = 1001;
+import com.application.app.utility.ConnectionDetector;
+import com.application.app.utility.Constants;
+import com.application.app.utility.TwitterSession;
+import com.example.android.bitmapfun.util.Utils;
+
+
+public class MainActivity extends Activity {
+
 	private static final String TAG = "MainActivity";
-	private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
-	private ConnectionDetector cd;
+	public static final int REQUEST_CODE = 100;
+	
 	private Twitter twitter;
 	private RequestToken requestToken;
 	private TwitterSession session;
-	private UpdateTwitterStatusTask mStatusTask;
-	private EditText editText;
+	private AuthenticationTask mAuthTask;
+	private RetriveAcessTokenTask mAccessTokenTask;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-		if (Build.VERSION.SDK_INT >= 9) {
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-		}
-		cd = new ConnectionDetector(getApplicationContext());
+		if (BuildConfig.DEBUG) {
+			Utils.enableStrictMode();
+	    }
+	    super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		session=new TwitterSession(this);
+		
 		// Check if Internet present
-		if (!cd.isConnectingToInternet()) {
+		if (!ConnectionDetector.isConnectingToInternet(this)) {
 			// Internet Connection is not present
 			Toast.makeText(MainActivity.this,getString(R.string.please_connect), Toast.LENGTH_SHORT).show();
 			// stop executing code by return
@@ -68,91 +58,109 @@ public class MainActivity extends FragmentActivity implements HomeFragment.OnTwi
 			// stop executing code by return
 			return;
 		}
-		session = new TwitterSession(this);
-		FragmentManager fm = getSupportFragmentManager();
-		fragments[LOGIN] = fm.findFragmentById(R.id.t_login);
-		fragments[HOME] = fm.findFragmentById(R.id.t_home);
-		FragmentTransaction transaction = fm.beginTransaction();
-		for (int i = 0; i < fragments.length; i++) {
-			transaction.hide(fragments[i]);
-		}
-		transaction.commit();
+		
 
-	}
-
-	@Override
-	protected void onResumeFragments() {
-		super.onResumeFragments();
-		if (session.isTwitterLoggedInAlready()) {
-			showFragment(HOME, false);
-		} else {
-			showFragment(LOGIN, false);
-		}
-
-	}
-
-	private void showFragment(int fragmentIndex, boolean addToBackStack) {
-		FragmentManager fm = getSupportFragmentManager();
-		FragmentTransaction transaction = fm.beginTransaction();
-		for (int i = 0; i < fragments.length; i++) {
-			if (i == fragmentIndex) {
-				transaction.show(fragments[i]);
-			} else {
-				transaction.hide(fragments[i]);
-			}
-		}
-		if (addToBackStack) {
-			transaction.addToBackStack(null);
-		}
-		transaction.commit();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (session.isTwitterLoggedInAlready()) {
-			showFragment(HOME, false);
-		} else {
-			showFragment(LOGIN, false);
-		}
+		if(session!=null)
+			if(session.isTwitterLoggedInAlready()) start();
+		
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
+		if(session!=null)
+			if(session.isTwitterLoggedInAlready()) finish();
 	}
-
 	@Override
 	protected void onNewIntent(Intent intent) {
+		
+		super.onNewIntent(intent);
 		Log.d(TAG, "Method calldes=>");
 		Uri uri = intent.getData();
-		super.onNewIntent(intent);
-		Log.d(TAG, "callback: " + uri.getScheme().toString());
-		if(!session.isTwitterLoggedInAlready()){
+		if(mAccessTokenTask!=null) return;
+		if (!session.isTwitterLoggedInAlready()) {
 			if (uri != null && uri.getScheme().equals(Constants.TWITTER_SCHEME)) {
 				// oAuth verifier
+				Log.d(TAG, "callback: " + uri.getScheme().toString());
 				String verifier = uri.getQueryParameter(Constants.URL_TWITTER_OAUTH_VERIFIER);
-				// Get the access token
-				try {
-					AccessToken accessToken = twitter.getOAuthAccessToken(requestToken,verifier);
-					session.saveSaveSession(accessToken, twitter);
-					String username = session.getUserName();
-					Log.d(TAG, "Twitter username=>" + username);
-					showFragment(HOME, false);
-				} catch (TwitterException e) {
-					// 
-					e.printStackTrace();
-					Log.e(TAG, "TwitterException=>"+e.getMessage());
-				}
-	
+				mAccessTokenTask=new RetriveAcessTokenTask();
+				mAccessTokenTask.execute(verifier);
+
 			}
 		}
-
 	}
+	
 
 	public void onAuth(View view) {
 		// Check if already logged in
+		if(mAuthTask!=null) return;
 		if (!session.isTwitterLoggedInAlready()) {
+			mAuthTask=new AuthenticationTask();
+			mAuthTask.execute((Void) null);
+			
+		} else {
+			// user already logged into twitter
+			Toast.makeText(this, "Already Logged into twitter",Toast.LENGTH_LONG).show();
+		}
+	}
+
+	public class RetriveAcessTokenTask extends AsyncTask<String, Integer, Boolean> {
+
+		@Override
+		protected Boolean doInBackground(String... params) {
+			
+			try {
+				AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, params[0]);
+				if(accessToken!=null){
+					session.saveSaveSession(accessToken, twitter);
+					String username = session.getUserName();
+					Log.d(TAG, "Twitter username=>" + username);
+					return true;
+				}else {
+					session.Logout();
+					return false;
+				}
+
+			} catch (TwitterException e) {
+				//
+				e.printStackTrace();
+				Log.e(TAG, "TwitterException=>" + e.getMessage());
+			}
+			return false;
+		}
+		@Override
+		protected void onPostExecute(Boolean result) {
+			
+			super.onPostExecute(result);
+			if(result) start();
+			else Toast.makeText(MainActivity.this, R.string.please_login_again,Toast.LENGTH_SHORT).show();
+			
+		}
+		
+
+	}
+	private void start() {
+		Intent intent=new Intent(MainActivity.this,TimelineActivity.class);
+		startActivity(intent);
+	}
+	public class AuthenticationTask extends AsyncTask<Void, Void,Boolean> {
+		ProgressDialog dialog;
+		@Override
+		protected void onPreExecute() {
+			
+			super.onPreExecute();
+			 dialog=new ProgressDialog(MainActivity.this);
+			dialog.setMessage("Please Wait...");
+			dialog.show();
+		}
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			
 			ConfigurationBuilder builder = new ConfigurationBuilder();
 			builder.setOAuthConsumerKey(Constants.TWITTER_CONSUMER_KEY);
 			builder.setOAuthConsumerSecret(Constants.TWITTER_CONSUMER_SECRET);
@@ -161,114 +169,36 @@ public class MainActivity extends FragmentActivity implements HomeFragment.OnTwi
 			twitter = factory.getInstance();
 			try {
 				requestToken = twitter.getOAuthRequestToken(Constants.TWITTER_CALLBACK_URL);
-				startActivityForResult(new Intent(Intent.ACTION_VIEW, Uri.parse(requestToken.getAuthenticationURL())), REQUEST_CODE);
+				Log.d(TAG, "requestToken=>" +requestToken.toString());
+				if (requestToken!=null) {
+					return true;
+				}
+			
+			
 			} catch (TwitterException e) {
 				e.printStackTrace();
-				Log.e(TAG, "TwitterException=>"+e.getMessage());
-			}
-		} else {
-			// user already logged into twitter
-			Toast.makeText(this, "Already Logged into twitter",Toast.LENGTH_LONG).show();
-		}
-	}
-	
-	public void onLogout(View view){
-		session.Logout();
-		showFragment(LOGIN, false);
-	}
-
-	@Override
-	public void onTwtterUpdatClick(EditText mStatusText) {
-		this.editText=mStatusText;
-		if(mStatusTask!=null){
-			return;
-		}
-		mStatusText.setError(null);
-		String mStatus = editText.getText().toString().trim();
-		if(TextUtils.isEmpty(mStatus)){
-			editText.setError(getString(R.string.this_field_require));
-			editText.requestFocus();
-		}else{
-			if(cd.isConnectingToInternet()){
-				mStatusTask=new UpdateTwitterStatusTask();
-				mStatusTask.execute(mStatus);
-			}else{
-				Toast.makeText(MainActivity.this, R.string.please_connect, Toast.LENGTH_SHORT).show();
-			}
-			
-		}
-		
-	}
-	class UpdateTwitterStatusTask extends AsyncTask<String, String, Boolean> {
-		ProgressDialog pDialog;
-		/**
-		 * Before starting background thread Show Progress Dialog
-		 * */
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			 pDialog = new ProgressDialog(MainActivity.this);
-			pDialog.setMessage("Updating to twitter...");
-			pDialog.setIndeterminate(false);
-			pDialog.setCancelable(false);
-			pDialog.show();
-		}
-
-		/**
-		 * getting Places JSON
-		 * */
-		protected Boolean doInBackground(String... args) {
-			Log.d("Tweet Text", "> " + args[0]);
-			String status = args[0];
-			try {
-				ConfigurationBuilder builder = new ConfigurationBuilder();
-				builder.setOAuthConsumerKey(Constants.TWITTER_CONSUMER_KEY);
-				builder.setOAuthConsumerSecret(Constants.TWITTER_CONSUMER_SECRET);
-				// Access Token
-				String access_token = session.getDefaultAccessToaken();
-				// Access Token Secret
-				String access_token_secret = session.getDefaultSecret();
-				AccessToken accessToken = new AccessToken(access_token,access_token_secret);
-				Twitter twitter = new TwitterFactory(builder.build()).getInstance(accessToken);
-				// Update status
-				twitter4j.Status response = twitter.updateStatus(status);
-				Log.d(TAG,"Response Text=>"+response.getText());
-				if(!TextUtils.isEmpty(response.getText())) return true;
-				
-			} catch (TwitterException e) {
-				// Error in updating status
-				Log.e(TAG,"TwitterException=>"+e.getMessage());
+				Log.e(TAG, "TwitterException=>" + e.getMessage());
 			}
 			return false;
 		}
-
-		/**
-		 * After completing background task Dismiss the progress dialog and show
-		 * the data in UI Always use runOnUiThread(new Runnable()) to update UI
-		 * from background thread, otherwise you will get error
-		 * **/
 		@Override
-		protected void onPostExecute(Boolean results) {
-			// dismiss the dialog after getting all products
-			// TODO Auto-generated method stub
-			mStatusTask=null;
-			pDialog.cancel();
-			if(results){
-				Toast.makeText(MainActivity.this,R.string.status_tweeted_successfully, Toast.LENGTH_SHORT).show();
-				editText.setText("");
-			}else{
-				Toast.makeText(MainActivity.this,"Retry", Toast.LENGTH_SHORT).show();
-			}
+		protected void onPostExecute(Boolean result) {
+			
+			super.onPostExecute(result);
+			mAuthTask=null;
+			dialog.cancel();
+			if(!result) Toast.makeText(MainActivity.this, "Retry",Toast.LENGTH_SHORT).show();
+			else startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(requestToken.getAuthenticationURL())));
 		}
 		@Override
 		protected void onCancelled() {
+			
 			super.onCancelled();
-			mStatusTask=null;
-			pDialog.cancel();
+			mAuthTask=null;
+			dialog.cancel();
 		}
 
 	}
-	
 	
 
 }

@@ -4,5 +4,6 @@
     <string name="app_name">RTwitter</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-
+    <string name="please_login_again">Please Login again</string>
+    
 </resources>
