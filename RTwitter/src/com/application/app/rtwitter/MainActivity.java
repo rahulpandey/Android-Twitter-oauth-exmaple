@@ -110,7 +110,15 @@ public class MainActivity extends Activity {
 	}
 
 	public class RetriveAcessTokenTask extends AsyncTask<String, Integer, Boolean> {
-
+		ProgressDialog dialog;
+		@Override
+		protected void onPreExecute() {
+			
+			super.onPreExecute();
+			dialog=new ProgressDialog(MainActivity.this);
+			dialog.setMessage("Please Wait Retriving Acess.......");
+			dialog.show();
+		}
 		@Override
 		protected Boolean doInBackground(String... params) {
 			
@@ -137,11 +145,20 @@ public class MainActivity extends Activity {
 		protected void onPostExecute(Boolean result) {
 			
 			super.onPostExecute(result);
+			mAccessTokenTask=null;
+			dialog.cancel();
+				
 			if(result) start();
 			else Toast.makeText(MainActivity.this, R.string.please_login_again,Toast.LENGTH_SHORT).show();
 			
 		}
-		
+		@Override
+		protected void onCancelled() {
+			// TODO Auto-generated method stub
+			super.onCancelled();
+			mAccessTokenTask=null;
+			dialog.cancel();
+		}
 
 	}
 	private void start() {
@@ -154,7 +171,7 @@ public class MainActivity extends Activity {
 		protected void onPreExecute() {
 			
 			super.onPreExecute();
-			 dialog=new ProgressDialog(MainActivity.this);
+			dialog=new ProgressDialog(MainActivity.this);
 			dialog.setMessage("Please Wait...");
 			dialog.show();
 		}
