@@ -11,7 +11,6 @@ public class RTwitterApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
 		Log.i(TAG, "Application started");
 	}
 

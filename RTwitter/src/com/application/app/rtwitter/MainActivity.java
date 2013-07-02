@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -36,9 +37,8 @@ public class MainActivity extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		if (BuildConfig.DEBUG) {
-			Utils.enableStrictMode();
-	    }
+		if (BuildConfig.DEBUG) Utils.enableStrictMode();
+	    
 	    super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		session=new TwitterSession(this);
@@ -46,15 +46,15 @@ public class MainActivity extends Activity {
 		// Check if Internet present
 		if (!ConnectionDetector.isConnectingToInternet(this)) {
 			// Internet Connection is not present
-			Toast.makeText(MainActivity.this,getString(R.string.please_connect), Toast.LENGTH_SHORT).show();
+			Toast.makeText(MainActivity.this,getString(R.string.please_connect), Toast.LENGTH_LONG).show();
 			// stop executing code by return
 			return;
 		}
 
 		// Check if twitter keys are set
-		if (Constants.TWITTER_CONSUMER_KEY.trim().length() == 0 || Constants.TWITTER_CONSUMER_SECRET.trim().length() == 0) {
+		if (TextUtils.isEmpty(Constants.TWITTER_CONSUMER_KEY) ||TextUtils.isEmpty( Constants.TWITTER_CONSUMER_SECRET)) {
 			// Internet Connection is not present
-			Toast.makeText(MainActivity.this, "Twitter oAuth tokens",Toast.LENGTH_SHORT).show();
+			Toast.makeText(MainActivity.this, "Twitter oAuth tokens",Toast.LENGTH_LONG).show();
 			// stop executing code by return
 			return;
 		}

@@ -73,8 +73,7 @@ public class TimelineFragment extends ListFragment {
 		mImageFetcher = new ImageFetcher(getActivity(), mImageThumbSize);
 		mImageFetcher.setLoadingImage(R.drawable.empty_photo);
 		mImageFetcher.addImageCache(getActivity().getFragmentManager(),cacheParams);
-		getListView().setDrawSelectorOnTop(true);
-		getListView().setSelector(getActivity().getResources().getDrawable(R.drawable.photogrid_list_selector));
+		getListView().setFastScrollEnabled(true);
 		getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 			@Override
 			public void onScrollStateChanged(AbsListView absListView,

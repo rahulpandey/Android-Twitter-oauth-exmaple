@@ -1,10 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-     <item
+    <item
         android:id="@+id/updateStauts"
-        android:orderInCategory="1"
+        android:orderInCategory="2"
         android:showAsAction="always"
-        android:title="@string/status"
-       />
+        android:title="@string/status"/>
+    <item
+        android:id="@+id/refresh"
+        android:icon="@drawable/ic_refresh"
+        android:orderInCategory="1"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/refresh"/>
 
 </menu>
