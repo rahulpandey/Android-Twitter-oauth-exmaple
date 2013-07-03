@@ -7,8 +7,8 @@ public class Constants {
 	 * Register your here app https://dev.twitter.com/apps/new and get your
 	 * consumer key and secret
 	 * */
-	public static String TWITTER_CONSUMER_KEY = ""; // place your// cosumer// key here
-	public static String TWITTER_CONSUMER_SECRET = ""; // place// your// consumer// secret// here
+	public static String TWITTER_CONSUMER_KEY = "NweU2zetoa3JQnQ1Obg7g"; // place your// cosumer// key here
+	public static String TWITTER_CONSUMER_SECRET = "eDPX8gTXci5RR15DU0sh8ep35Rfiv4YpW2pzux1gxlQ"; // place// your// consumer// secret// here
 	// Preference Constants
 	public static String PREFERENCE_NAME = "twitter_oauth";
 	public static final String PREF_KEY_OAUTH_TOKEN = "oauth_token";

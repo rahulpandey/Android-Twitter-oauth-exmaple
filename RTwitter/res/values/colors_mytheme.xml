@@ -18,5 +18,6 @@
 -->
 
 <resources>
-    <color name="pressed_mytheme">#CC33B5E5</color>
+    
+     <color name="my_custom_color">#ff1a557c</color>
 </resources>

@@ -4,8 +4,7 @@
     android:layout_height="wrap_content"
     android:background="#ffffff"
     android:baselineAligned="false"
-    android:orientation="horizontal"
-     >
+    android:orientation="horizontal" >
 
     <LinearLayout
         android:id="@+id/ft"
@@ -41,9 +40,9 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:fontFamily="sans-serif-condensed"
                 android:text="@string/hello_world"
                 android:textColor="#006699"
-                android:fontFamily="sans-serif-condensed"
                 android:textStyle="bold" />
 
             <TextView
@@ -51,9 +50,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/small_margn"
+                android:fontFamily="sans-serif-condensed"
                 android:text="@string/hello_world"
                 android:textColor="#006699"
-                 android:fontFamily="sans-serif-condensed"
                 android:textStyle="bold" />
         </LinearLayout>
 
