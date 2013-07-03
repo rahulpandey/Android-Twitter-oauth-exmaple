@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -24,7 +25,7 @@ import com.application.app.utility.TwitterSession;
 import com.example.android.bitmapfun.util.Utils;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
 
 	private static final String TAG = "MainActivity";
 	public static final int REQUEST_CODE = 100;
@@ -110,14 +111,14 @@ public class MainActivity extends Activity {
 	}
 
 	public class RetriveAcessTokenTask extends AsyncTask<String, Integer, Boolean> {
-		ProgressDialog dialog;
+		ProgressDialog pDialog;
 		@Override
 		protected void onPreExecute() {
 			
 			super.onPreExecute();
-			dialog=new ProgressDialog(MainActivity.this);
-			dialog.setMessage("Please Wait Retriving Acess.......");
-			dialog.show();
+			pDialog=new ProgressDialog(MainActivity.this);
+			pDialog.setMessage("Please Wait Retriving Acess.......");
+			pDialog.show();
 		}
 		@Override
 		protected Boolean doInBackground(String... params) {
@@ -146,7 +147,7 @@ public class MainActivity extends Activity {
 			
 			super.onPostExecute(result);
 			mAccessTokenTask=null;
-			dialog.cancel();
+			pDialog.cancel();
 				
 			if(result) start();
 			else Toast.makeText(MainActivity.this, R.string.please_login_again,Toast.LENGTH_SHORT).show();
@@ -157,7 +158,7 @@ public class MainActivity extends Activity {
 			// TODO Auto-generated method stub
 			super.onCancelled();
 			mAccessTokenTask=null;
-			dialog.cancel();
+			pDialog.cancel();
 		}
 
 	}

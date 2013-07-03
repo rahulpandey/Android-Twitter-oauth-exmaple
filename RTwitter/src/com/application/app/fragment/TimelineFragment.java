@@ -1,5 +1,6 @@
 package com.application.app.fragment;
 
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,11 +13,11 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
 import android.annotation.SuppressLint;
-import android.app.ListFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,7 +73,7 @@ public class TimelineFragment extends ListFragment {
 		// children asynchronously
 		mImageFetcher = new ImageFetcher(getActivity(), mImageThumbSize);
 		mImageFetcher.setLoadingImage(R.drawable.empty_photo);
-		mImageFetcher.addImageCache(getActivity().getFragmentManager(),cacheParams);
+		mImageFetcher.addImageCache(getActivity().getSupportFragmentManager(),cacheParams);
 		getListView().setFastScrollEnabled(true);
 		getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
 			@Override

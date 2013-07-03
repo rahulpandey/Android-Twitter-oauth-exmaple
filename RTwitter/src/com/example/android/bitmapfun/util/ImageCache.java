@@ -37,6 +37,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.util.LruCache;
 import android.util.Log;
@@ -98,7 +99,7 @@ public class ImageCache {
      * @return An existing retained ImageCache object or a new one if one did not exist
      */
     public static ImageCache getInstance(
-            android.app.FragmentManager fragmentManager, ImageCacheParams cacheParams) {
+            FragmentManager fragmentManager, ImageCacheParams cacheParams) {
 
         // Search for, or create an instance of the non-UI RetainFragment
         final RetainFragment mRetainFragment = findOrCreateRetainFragment(fragmentManager);
@@ -615,7 +616,7 @@ public class ImageCache {
      * @return The existing instance of the Fragment or the new instance if just
      *         created.
      */
-    private static RetainFragment findOrCreateRetainFragment(android.app.FragmentManager fragmentManager) {
+    private static RetainFragment findOrCreateRetainFragment(FragmentManager fragmentManager) {
         // Check to see if we have retained the worker fragment.
         RetainFragment mRetainFragment = (RetainFragment) fragmentManager.findFragmentByTag(TAG);
 
@@ -632,7 +633,7 @@ public class ImageCache {
      * A simple non-UI Fragment that stores a single Object and is retained over configuration
      * changes. It will be used to retain the ImageCache object.
      */
-    public static class RetainFragment extends android.app.Fragment {
+    public static class RetainFragment extends Fragment {
         private Object mObject;
 
         /**

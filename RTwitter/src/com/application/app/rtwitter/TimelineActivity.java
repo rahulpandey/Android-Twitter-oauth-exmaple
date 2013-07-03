@@ -1,6 +1,5 @@
 package com.application.app.rtwitter;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,7 +7,7 @@ import android.view.MenuItem;
 
 import com.example.android.bitmapfun.util.Utils;
 
-public class TimelineActivity extends Activity {
+public class TimelineActivity extends FragActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
