@@ -99,6 +99,9 @@ public class MainActivity extends FragmentActivity {
 	public void onAuth(View view) {
 		// Check if already logged in
 		if(mAuthTask!=null) return;
+		/**
+		 * Here we could also check for Internet connection 
+		 */
 		if (!session.isTwitterLoggedInAlready()) {
 			mAuthTask=new AuthenticationTask();
 			mAuthTask.execute((Void) null);
