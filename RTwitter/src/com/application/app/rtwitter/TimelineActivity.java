@@ -9,16 +9,14 @@ import android.view.MenuItem;
 import com.example.android.bitmapfun.util.Utils;
 
 public class TimelineActivity extends FragmentActivity {
+	public static final String REL = "rel";
 	public static final String RELOAD_LOADER = "RELOAD_LOADER";
 	public static final String RELOAD = "RELOAD";
 	
 	/**
 	 * This is timeline actvity
 	 */
-	OnRsetListListener listener;
-	public interface OnRsetListListener{
-		public void onReset();
-	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -46,7 +44,7 @@ public class TimelineActivity extends FragmentActivity {
 		case R.id.refresh:
 			intent=new Intent();
 			intent.setAction(RELOAD_LOADER);
-			intent.putExtra("rel",RELOAD);
+			intent.putExtra(REL,RELOAD);
 			sendBroadcast(intent);
 			return true;
 		default:

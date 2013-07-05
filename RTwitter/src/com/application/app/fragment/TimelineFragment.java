@@ -28,7 +28,7 @@ import com.application.app.rtwitter.TimelineActivity;
 import com.example.android.bitmapfun.util.ImageCache.ImageCacheParams;
 import com.example.android.bitmapfun.util.ImageFetcher;
 
-public class TimelineFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<HashMap<String, String>>>,TimelineActivity.OnRsetListListener{
+public class TimelineFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<HashMap<String, String>>>{
 	private static final String IMAGE_CACHE_DIR = "thumbs";
 	private static final String TAG = "TimelineFragment";
 	private int mImageThumbSize;
@@ -43,6 +43,7 @@ public class TimelineFragment extends ListFragment implements LoaderManager.Load
 		intentFilter.addAction(TimelineActivity.RELOAD_LOADER);
 		mImageThumbSize = getResources().getDimensionPixelSize(R.dimen.image_default_thumbnail_size);
 		mAdapter = new TweetAdapter(getActivity());
+		
 		setListAdapter(mAdapter);
 		setListShown(false);
 
@@ -187,7 +188,7 @@ public class TimelineFragment extends ListFragment implements LoaderManager.Load
 		ImageView thumb_image;
 	}
 
-	@Override
+	
 	public void onReset() {
 		int i=0;
 		Log.d(TAG, "onReset=>click"+(i++));
@@ -198,9 +199,10 @@ public class TimelineFragment extends ListFragment implements LoaderManager.Load
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
-			if(intent.getExtras().getString("rel").equals(TimelineActivity.RELOAD)){
+			if(intent.getExtras().getString(TimelineActivity.REL).equals(TimelineActivity.RELOAD)){
 				onReset();
 			}
 		}
 	};
+	
 }
