@@ -52,6 +52,7 @@ public class ListLoader extends AsyncTaskLoader<List<HashMap<String, String>>> {
 		Twitter twitter = new TwitterFactory(builder.build()).getInstance(accessToken);
 		List<HashMap<String, String>> entries = new ArrayList<HashMap<String, String>>(stautsList.size());
 		try {
+
 			statuses = twitter.getHomeTimeline();
 			if (!statuses.isEmpty()) {
 				for (twitter4j.Status status : statuses) {

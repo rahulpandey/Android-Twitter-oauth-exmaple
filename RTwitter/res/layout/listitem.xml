@@ -60,9 +60,11 @@
             android:id="@+id/txtTweets"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autoLink="all"
             android:text="@string/hello_world"
-            android:textColor="#222" 
-            android:autoLink="all"/>
+            android:textColor="#222"
+            android:textColorLink="@color/mycolor" />
+
     </LinearLayout>
 
 </LinearLayout>
