@@ -29,19 +29,17 @@ public class ListLoader extends AsyncTaskLoader<List<HashMap<String, String>>> {
 	public static final String KEY_CREATED_AT = "createdat";
 	private static final String TAG = "ListLoader";
 	private List<twitter4j.Status> statuses = null;
-	
+
 	public ListLoader(Context context) {
 		super(context);
 		session = new TwitterSession(context);
-		
+
 	}
-	
-	
 
 	@Override
 	public List<HashMap<String, String>> loadInBackground() {
 		// TODO Auto-generated method stub
-		
+
 		ConfigurationBuilder builder = new ConfigurationBuilder();
 		builder.setOAuthConsumerKey(Constants.TWITTER_CONSUMER_KEY);
 		builder.setOAuthConsumerSecret(Constants.TWITTER_CONSUMER_SECRET);
@@ -52,26 +50,24 @@ public class ListLoader extends AsyncTaskLoader<List<HashMap<String, String>>> {
 		String access_token_secret = session.getDefaultSecret();
 		AccessToken accessToken = new AccessToken(access_token,access_token_secret);
 		Twitter twitter = new TwitterFactory(builder.build()).getInstance(accessToken);
-
-		
+		List<HashMap<String, String>> entries = new ArrayList<HashMap<String, String>>(stautsList.size());
 		try {
 			statuses = twitter.getHomeTimeline();
+			if (!statuses.isEmpty()) {
+				for (twitter4j.Status status : statuses) {
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put(KEY_NAME, status.getUser().getName());
+					map.put(KEY_PROFILE_PIC, status.getUser().getProfileImageURL());
+					map.put(KEY_TWEETS, status.getText());
+					Log.d(TAG, "Status=>" + status.getText());
+					map.put(KEY_CREATED_AT,String.valueOf(status.getCreatedAt().getTime()));
+					entries.add(map);
+
+				}
+			}
 		} catch (TwitterException e) {
 			// TODO Auto-generated catch block
-			Log.d(TAG, "TwitterException=>" + e.getMessage());
-		}
-		List<HashMap<String, String>> entries = new ArrayList<HashMap<String, String>>(stautsList.size());
-		if (!statuses.isEmpty()) {
-			for (twitter4j.Status status : statuses) {
-				HashMap<String, String> map = new HashMap<String, String>();
-				map.put(KEY_NAME, status.getUser().getName());
-				map.put(KEY_PROFILE_PIC, status.getUser().getProfileImageURL());
-				map.put(KEY_TWEETS, status.getText());
-				Log.d(TAG, "Status=>" + status.getText());
-				map.put(KEY_CREATED_AT,String.valueOf(status.getCreatedAt().getTime()));
-				entries.add(map);
-			
-			}
+			Log.e(TAG, "TwitterException=>" + e.getMessage());
 		}
 		return entries;
 	}
@@ -90,31 +86,34 @@ public class ListLoader extends AsyncTaskLoader<List<HashMap<String, String>>> {
 
 		// If the Loader is currently started, we can immediately
 		// deliver its results.
-		if (isStarted()) super.deliverResult(data);
+		if (isStarted())
+			super.deliverResult(data);
 
 		// At this point we can release the resources associated with
 		// 'oldApps' if needed; now that the new result is delivered we
 		// know that it is no longer in use.
-		if (oldData != null) onReleaseResources(oldData);
+		if (oldData != null)
+			onReleaseResources(oldData);
 
 	}
+
 	@Override
 	protected void onStartLoading() {
-        if (stautsList != null) {
-            // If we currently have a result available, deliver it
-            // immediately.
-            deliverResult(stautsList);
-        }
+		if (stautsList != null) {
+			// If we currently have a result available, deliver it
+			// immediately.
+			deliverResult(stautsList);
+		}
 
-        
-        boolean configChange = mLastConfig.applyNewConfig(getContext().getResources());
-        if (takeContentChanged() || stautsList == null || configChange) {
-            // If the data has changed since the last time it was loaded
-            // or is not currently available, start a load.
-            forceLoad();
-        }
-    }
-	
+		boolean configChange = mLastConfig.applyNewConfig(getContext()
+				.getResources());
+		if (takeContentChanged() || stautsList == null || configChange) {
+			// If the data has changed since the last time it was loaded
+			// or is not currently available, start a load.
+			forceLoad();
+		}
+	}
+
 	/**
 	 * Handles a request to stop the Loader.
 	 */
@@ -157,20 +156,23 @@ public class ListLoader extends AsyncTaskLoader<List<HashMap<String, String>>> {
 		// like a Cursor, we would close it here.
 
 	}
-	public static class InterestingConfigChanges {
-        final Configuration mLastConfiguration = new Configuration();
-        int mLastDensity;
 
-        boolean applyNewConfig(Resources res) {
-            int configChanges = mLastConfiguration.updateFrom(res.getConfiguration());
-            boolean densityChanged = mLastDensity != res.getDisplayMetrics().densityDpi;
-            if (densityChanged || (configChanges&(ActivityInfo.CONFIG_LOCALE
-                   |ActivityInfo.CONFIG_UI_MODE|ActivityInfo.CONFIG_SCREEN_LAYOUT)) != 0) {
-                mLastDensity = res.getDisplayMetrics().densityDpi;
-                return true;
-            }
-            return false;
-        }
-    }
-	 
+	public static class InterestingConfigChanges {
+		final Configuration mLastConfiguration = new Configuration();
+		int mLastDensity;
+
+		boolean applyNewConfig(Resources res) {
+			int configChanges = mLastConfiguration.updateFrom(res
+					.getConfiguration());
+			boolean densityChanged = mLastDensity != res.getDisplayMetrics().densityDpi;
+			if (densityChanged
+					|| (configChanges & (ActivityInfo.CONFIG_LOCALE
+							| ActivityInfo.CONFIG_UI_MODE | ActivityInfo.CONFIG_SCREEN_LAYOUT)) != 0) {
+				mLastDensity = res.getDisplayMetrics().densityDpi;
+				return true;
+			}
+			return false;
+		}
+	}
+
 }

@@ -133,7 +133,7 @@ public class MainActivity extends FragmentActivity {
 					Log.d(TAG, "Twitter username=>" + username);
 					return true;
 				}else {
-					session.Logout();
+					session.logout();
 					return false;
 				}
 

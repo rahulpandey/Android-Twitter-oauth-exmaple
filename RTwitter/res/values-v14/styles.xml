@@ -7,9 +7,9 @@
     </style>
 
     <style name="MyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">#b3000000</item>
-        <item name="android:backgroundStacked">#b3000000</item>
-        <item name="android:backgroundSplit">#b3000000</item>
+        <item name="android:background">@color/mycolor</item>
+        <item name="android:backgroundStacked">@color/mycolor</item>
+        <item name="android:backgroundSplit">@color/mycolor</item>
         <item name="android:titleTextStyle">@style/action_bar_text</item>
     </style>
 

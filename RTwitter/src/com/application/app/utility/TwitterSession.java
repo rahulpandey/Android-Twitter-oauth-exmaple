@@ -47,7 +47,7 @@ public class TwitterSession {
 	public String getUserName(){
 		return mSharedPreferences.getString(Constants.TWITTER_USER_NAME, "");
 	}
-	public void Logout(){
+	public void logout(){
 		Editor e = mSharedPreferences.edit();
 		e.remove(Constants.PREF_KEY_OAUTH_TOKEN);
 		e.remove(Constants.PREF_KEY_OAUTH_SECRET);

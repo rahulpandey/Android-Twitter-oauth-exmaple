@@ -14,7 +14,7 @@
     </style>
 
     <style name="action_v11" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">@android:color/background_dark</item>
+        <item name="android:background">@color/mycolor</item>
         <item name="android:titleTextStyle">@style/action_bar_text</item>
     </style>
      <style name="actvity_style_version">
